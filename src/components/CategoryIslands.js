@@ -23,7 +23,7 @@ export default function CategoryIslands({ title, tasks }) {
               className="bg-pink-50 text-pink-800 p-2 rounded-md text-sm flex items-center gap-2 transition hover:bg-pink-100"
             >
               <span className="w-3 h-3 rounded-full border border-pink-500 shrink-0" />
-              {task}
+              {task.name}
             </div>
           ) : (
             <div key={i} className="p-2 rounded-md opacity-0 pointer-events-none">

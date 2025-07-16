@@ -5,7 +5,7 @@ export default function TaskPanel({ isOpen, onClose}) {
     <aside
     className={`h-full bg-white border-l shadow-lg transition-all duration-300 ${
         isOpen ? "w-96" : "w-0"
-    } overflow-hidden`}
+    }`}
     >
       <div className="flex flex-col h-full px-6 py-5">
         {/* Panel Heading */}

@@ -84,9 +84,9 @@ export default function Home() {
         <SideBarItem icon={<FileUp />} text="Export" />
       </SideBar>
 
-      
-      <div className="flex flex-1 relative overflow-hidden">
-        <main className="flex-1 transition-all duration-300">
+        
+      <div className="flex flex-1 relative">
+        <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
           <TopBar title="To-Do List" onAddTask={() => setTaskPanelOpen(true)} isTaskPanelOpen={isTaskPanelOpen}/>
 
           <IslandGrid>
