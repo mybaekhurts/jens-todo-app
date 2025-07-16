@@ -1,10 +1,11 @@
 import { Calendar, Plus, X } from "lucide-react"
 
-export default function TaskPanel({ isOpen = true }) {
+export default function TaskPanel({ isOpen, onClose}) {
   return (
     <aside
-      className={`h-screen bg-white border-l shadow-lg w-96 transition-all duration-300
-        ${isOpen ? "translate-x-0" : "translate-x-full"} fixed right-0 top-0 z-40`}
+    className={`h-full bg-white border-l shadow-lg transition-all duration-300 ${
+        isOpen ? "w-96" : "w-0"
+    } overflow-hidden`}
     >
       <div className="flex flex-col h-full px-6 py-5">
         {/* Panel Heading */}
@@ -66,7 +67,7 @@ export default function TaskPanel({ isOpen = true }) {
 
         {/* Footer Buttons */}
         <div className="mt-6 flex justify-between">
-          <button className="px-4 py-2 rounded-md border text-gray-600 hover:bg-gray-100">
+          <button onClick={onClose} className="px-4 py-2 rounded-md border text-gray-600 hover:bg-gray-100">
             Cancel
           </button>
           <button className="px-4 py-2 rounded-md bg-pink-500 text-white hover:bg-pink-600">

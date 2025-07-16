@@ -1,6 +1,6 @@
 import { Search, Plus } from "lucide-react"
 
-export default function TopBar({ title }) {
+export default function TopBar({ title, onAddTask, isTaskPanelOpen}) {
   return (
     <div className="h-28 px-6 py-4 flex border-b bg-white shadow-sm">
       {/* Left 2/3: heading + search */}
@@ -18,9 +18,15 @@ export default function TopBar({ title }) {
 
       {/* Right 1/3: Plus button centered */}
       <div className="w-1/3 flex justify-center items-center">
-        <button className="p-2 bg-pink-100 text-pink-800 rounded-lg hover:bg-pink-200">
-          <Plus size={20} />
-        </button>
+        <div
+          className={`transition-transform duration-300${
+            isTaskPanelOpen ? " opacity-0" : "opacity-100"
+          }`}
+        >
+          <button onClick={onAddTask} className="p-2 bg-pink-100 text-pink-800 z-49 rounded-lg hover:bg-pink-200">
+            <Plus size={20} />
+          </button>
+        </div>
       </div>
     </div>
   )
