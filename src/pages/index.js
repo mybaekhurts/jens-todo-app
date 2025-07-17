@@ -20,6 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
+  // State management for task panel and tasks
   const [isTaskPanelOpen, setTaskPanelOpen] = useState(false)
   const [tasks, setTasks] = useState([])
   useEffect(() => {
@@ -61,11 +62,9 @@ export default function Home() {
       ])
     }
   }, [])
-
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks))
   }, [tasks])
-
   const toggleTaskComplete = (id) => {
     setTasks(prev =>
       prev.map(task =>
@@ -74,10 +73,11 @@ export default function Home() {
     );
   };
 
+  // Tasks CRUD
+  const handleOpenPanel = () => setTaskPanelOpen(true)
   const addTask = (task) => {
     setTasks(prev => [...prev, { id: uuidv4(), completed: false, subtasks: [], ...task }])
   }
-
   const updateTask = (updatedTask) => {
     setTasks(prev =>
       prev.map(task =>
@@ -85,12 +85,20 @@ export default function Home() {
       )
     )
   }
-
   const [editingTask, setEditingTask] = useState(null)
 
-  const handleOpenPanel = () => setTaskPanelOpen(true)
-
+  // Search and filter functionality
   const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const filteredTasks = tasks.filter((task) => {
+    if (statusFilter === "completed") return task.completed
+    if (statusFilter === "incomplete") return !task.completed
+    return true
+  }).filter((task) =>
+    task.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
 
   // const tasks = {
   //   urgent: ["RUN"],
@@ -132,84 +140,67 @@ export default function Home() {
             isTaskPanelOpen={isTaskPanelOpen}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
           />
           <IslandGrid>
-            <CategoryIslands title="Urgent" 
-              tasks={tasks.filter(t => t.category === "Urgent")
-                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              } 
+            <CategoryIslands
+              title="Urgent"
+              tasks={filteredTasks.filter(t => t.category === "Urgent")}
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+              itemsPerPage={itemsPerPage}
+            />
+            <CategoryIslands title="Personal"
+              tasks={filteredTasks.filter(t => t.category === "Personal")}
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+              itemsPerPage={itemsPerPage}
+            />
+            <CategoryIslands title="School"
+              tasks={filteredTasks.filter(t => t.category === "School")}
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+              itemsPerPage={itemsPerPage}
+            />
+            <CategoryIslands title="Entertainment"
+              tasks={filteredTasks.filter(t => t.category === "Entertainment")}
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+              itemsPerPage={itemsPerPage}
+            />
+            <CategoryIslands title="Work"
+              tasks={filteredTasks.filter(t => t.category === "Work")}
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
                 setTaskPanelOpen(true)
               }}
             />
-            <CategoryIslands title="Personal" 
-              tasks={tasks.filter(t => t.category === "Personal")
-                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              } 
+            <CategoryIslands title="Untagged"
+              tasks={filteredTasks.filter(t => t.category === "Untagged")}
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
                 setTaskPanelOpen(true)
               }}
+              itemsPerPage={itemsPerPage}
             />
-            <CategoryIslands title="School" 
-              tasks={tasks.filter(t => t.category === "School")
-                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              } 
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-            />
-            <CategoryIslands title="Entertainment" 
-              tasks={tasks.filter(t => t.category === "Entertainment")
-                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              } 
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-            />
-            <CategoryIslands title="Work" 
-              tasks={tasks.filter(t => t.category === "Work")
-                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              } 
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-            />
-            <CategoryIslands title="Untagged" 
-              tasks={tasks.filter(t => t.category === "Untagged")
-                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              } 
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-            />
-
-            {/* <CategoryIslands title="Urgent" tasks={tasks.urgent} />
-            <CategoryIslands title="Personal" tasks={tasks.personal} />
-            <CategoryIslands title="School" tasks={tasks.school} />
-            <CategoryIslands title="Entertainment" tasks={tasks.entertainment} />
-            <CategoryIslands title="Work" tasks={tasks.work} />
-            <CategoryIslands title="Untagged" tasks={tasks.untagged} /> */}
           </IslandGrid>
-          {/* <div className="p-6 flex gap-4 overflow-x-auto">
-            <CategoryIslands title="Urgent" tasks={tasks.urgent} />
-            <CategoryIslands title="Personal" tasks={tasks.personal} />
-            <CategoryIslands title="School" tasks={tasks.school} />
-            <CategoryIslands title="Entertainment" tasks={tasks.entertainment} />
-            <CategoryIslands title="Work" tasks={tasks.work} />
-            <CategoryIslands title="Untagged" tasks={tasks.untagged} />
-          </div> */}
         </main>
         <TaskPanel
           isOpen={isTaskPanelOpen}

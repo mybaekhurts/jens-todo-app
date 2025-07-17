@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask }) {
+export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask, itemsPerPage }) {
   const [page, setPage] = useState(0)
-  const pageSize = 6
-  const totalPages = Math.ceil(tasks.length / pageSize)
-  const paginatedTasks = tasks.slice(page * pageSize, (page + 1) * pageSize)
+  // const pageSize = 6
+  // const visibleTasks = tasks.slice(0, itemsPerPage)
+  const totalPages = Math.ceil(tasks.length / itemsPerPage)
+  const paginatedTasks = tasks.slice(page * itemsPerPage, (page + 1) * itemsPerPage)
 
   return (
     <div className="w-72 bg-white rounded-2xl shadow p-4 flex flex-col shrink-0">
@@ -13,8 +14,8 @@ export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask
         <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
       </div>
 
-      <div className={`flex-1 space-y-2`} style={{minHeight: `${pageSize * 36}px`}}>
-        {Array.from({ length: pageSize }).map((_, i) => {
+      <div className={`flex-1 space-y-2`} style={{minHeight: `${itemsPerPage * 36}px`}}>
+        {Array.from({ length: itemsPerPage }).map((_, i) => {
           const task = paginatedTasks[i]
           return task ? (
             <div
@@ -55,12 +56,12 @@ export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask
         </button>
 
         <span className="text-s text-gray-500">
-          {Math.min((page + 1) * pageSize, tasks.length)} of {tasks.length}
+          {Math.min((page + 1) * itemsPerPage, tasks.length)} of {tasks.length}
         </span>
 
         <button
-          onClick={() => setPage((p) => (p + 1) * pageSize < tasks.length ? p + 1 : p)}
-          disabled={(page + 1) * pageSize >= tasks.length}
+          onClick={() => setPage((p) => (p + 1) * itemsPerPage < tasks.length ? p + 1 : p)}
+          disabled={(page + 1) * itemsPerPage >= tasks.length}
           className="flex items-center gap-1 disabled:opacity-30 hover:text-pink-800 transition"
         >
           <ChevronRight size={24} />

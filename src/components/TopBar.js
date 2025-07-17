@@ -1,9 +1,8 @@
 import { Search, Plus } from "lucide-react"
 
-export default function TopBar({ title, onAddTask, isTaskPanelOpen, searchTerm, setSearchTerm}) {
+export default function TopBar({ title, onAddTask, isTaskPanelOpen, searchTerm, setSearchTerm, statusFilter, setStatusFilter, itemsPerPage, setItemsPerPage }) {
   return (
-    <div className="h-28 px-6 py-4 flex border-b bg-white shadow-sm">
-      {/* Left 2/3: heading + search */}
+    <div className="h-32 px-6 py-4 flex border-b bg-white shadow-sm">
       <div className="w-2/3 flex flex-col justify-between">
         <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
         <div className="relative mt-2">
@@ -15,6 +14,53 @@ export default function TopBar({ title, onAddTask, isTaskPanelOpen, searchTerm, 
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-3 py-2 rounded-full border-2 border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm"
           />
+        </div>
+        <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+          <div className="flex items-center gap-1">
+            <input
+              type="radio"
+              name="status"
+              value="all"
+              checked={statusFilter === "all"}
+              onChange={() => setStatusFilter("all")}
+              className="accent-pink-500"
+            />
+            <label>All</label>
+          </div>
+          <div className="flex items-center gap-1">
+            <input
+              type="radio"
+              name="status"
+              value="completed"
+              checked={statusFilter === "completed"}
+              onChange={() => setStatusFilter("completed")}
+              className="accent-pink-500"
+            />
+            <label>Completed</label>
+          </div>
+          <div className="flex items-center gap-1">
+            <input
+              type="radio"
+              name="status"
+              value="incomplete"
+              checked={statusFilter === "incomplete"}
+              onChange={() => setStatusFilter("incomplete")}
+              className="accent-pink-500"
+            />
+            <label>Incomplete</label>
+          </div>
+          <div className="flex items-center gap-1">
+            <label>Show</label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              className="border rounded px-2 py-1"
+            >
+              {Array.from({ length: 8 }, (_, i) => i + 3).map(n => (
+                <option key={n} value={n}>Show {n} tasks</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
