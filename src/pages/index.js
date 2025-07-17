@@ -78,7 +78,20 @@ export default function Home() {
     setTasks(prev => [...prev, { id: uuidv4(), completed: false, subtasks: [], ...task }])
   }
 
+  const updateTask = (updatedTask) => {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    )
+  }
+
   const [editingTask, setEditingTask] = useState(null)
+
+  const handleOpenPanel = () => setTaskPanelOpen(true)
+
+  const [searchTerm, setSearchTerm] = useState("")
+
   // const tasks = {
   //   urgent: ["RUN"],
   //   personal: [
@@ -113,11 +126,18 @@ export default function Home() {
 
       <div className="flex flex-1 relative">
         <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
-          <TopBar title="To-Do List" onAddTask={() => setTaskPanelOpen(true)} isTaskPanelOpen={isTaskPanelOpen}/>
-
+          <TopBar
+            title="Dashboard"
+            onAddTask={handleOpenPanel}
+            isTaskPanelOpen={isTaskPanelOpen}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
           <IslandGrid>
             <CategoryIslands title="Urgent" 
-              tasks={tasks.filter(t => t.category === "Urgent")} 
+              tasks={tasks.filter(t => t.category === "Urgent")
+                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              } 
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
@@ -125,7 +145,9 @@ export default function Home() {
               }}
             />
             <CategoryIslands title="Personal" 
-              tasks={tasks.filter(t => t.category === "Personal")} 
+              tasks={tasks.filter(t => t.category === "Personal")
+                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              } 
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
@@ -133,7 +155,9 @@ export default function Home() {
               }}
             />
             <CategoryIslands title="School" 
-              tasks={tasks.filter(t => t.category === "School")} 
+              tasks={tasks.filter(t => t.category === "School")
+                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              } 
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
@@ -141,7 +165,9 @@ export default function Home() {
               }}
             />
             <CategoryIslands title="Entertainment" 
-              tasks={tasks.filter(t => t.category === "Entertainment")} 
+              tasks={tasks.filter(t => t.category === "Entertainment")
+                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              } 
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
@@ -149,7 +175,9 @@ export default function Home() {
               }}
             />
             <CategoryIslands title="Work" 
-              tasks={tasks.filter(t => t.category === "Work")} 
+              tasks={tasks.filter(t => t.category === "Work")
+                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              } 
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
@@ -157,7 +185,9 @@ export default function Home() {
               }}
             />
             <CategoryIslands title="Untagged" 
-              tasks={tasks.filter(t => t.category === "Untagged")} 
+              tasks={tasks.filter(t => t.category === "Untagged")
+                .filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              } 
               onToggleTask={toggleTaskComplete}
               onEditTask={(task) => {
                 setEditingTask(task)
@@ -188,6 +218,7 @@ export default function Home() {
             setEditingTask(null)
           }}
           onAddTask={addTask}
+          onUpdateTask={updateTask}
           editingTask={editingTask}
         />
       </div>

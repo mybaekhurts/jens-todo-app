@@ -19,13 +19,20 @@ export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask
           return task ? (
             <div
               key={task.id}
-              className="bg-pink-50 text-pink-800 p-2 rounded-md text-sm flex items-center gap-2 transition hover:bg-pink-100"
+              className={`p-2 rounded-md text-sm flex items-center gap-2 transition ${
+                task.completed
+                  ? "bg-gray-100 text-gray-500 line-through opacity-60"
+                  : "bg-pink-50 text-pink-800 hover:bg-pink-100"
+              }`}
               onClick={() => onEditTask?.(task)}
             >
               <button
-                onClick={() => onToggleTask(task.id)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleTask(task.id)
+                }}
                 className={`w-3 h-3 rounded-full border shrink-0 ${
-                  task.completed ? 'bg-pink-500 border-pink-500' : 'border-pink-500'
+                  task.completed ? 'bg-gray-500 border-gray-500' : 'border-grey-500'
                 }`}
               />
               <span className={task.completed ? 'line-through opacity-60' : ''}>{task.name}</span>
