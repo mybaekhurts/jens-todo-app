@@ -1,11 +1,10 @@
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-export default function CategoryIslands({ title, tasks }) {
+export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask }) {
   const [page, setPage] = useState(0)
   const pageSize = 6
   const totalPages = Math.ceil(tasks.length / pageSize)
-
   const paginatedTasks = tasks.slice(page * pageSize, (page + 1) * pageSize)
 
   return (
@@ -19,11 +18,17 @@ export default function CategoryIslands({ title, tasks }) {
           const task = paginatedTasks[i]
           return task ? (
             <div
-              key={i}
+              key={task.id}
               className="bg-pink-50 text-pink-800 p-2 rounded-md text-sm flex items-center gap-2 transition hover:bg-pink-100"
+              onClick={() => onEditTask?.(task)}
             >
-              <span className="w-3 h-3 rounded-full border border-pink-500 shrink-0" />
-              {task.name}
+              <button
+                onClick={() => onToggleTask(task.id)}
+                className={`w-3 h-3 rounded-full border shrink-0 ${
+                  task.completed ? 'bg-pink-500 border-pink-500' : 'border-pink-500'
+                }`}
+              />
+              <span className={task.completed ? 'line-through opacity-60' : ''}>{task.name}</span>
             </div>
           ) : (
             <div key={i} className="p-2 rounded-md opacity-0 pointer-events-none">

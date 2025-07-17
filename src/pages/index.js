@@ -4,7 +4,7 @@ import TopBar from "../components/TopBar"
 import CategoryIslands from "@/components/CategoryIslands"
 import IslandGrid from "@/components/IslandGrid"
 import TaskPanel from "@/components/TaskPanel"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { ClipboardList, Calendar, FileDown, FileUp } from "lucide-react"
 
@@ -21,38 +21,64 @@ const geistMono = Geist_Mono({
 
 export default function Home() {
   const [isTaskPanelOpen, setTaskPanelOpen] = useState(false)
-  const [tasks, setTasks] = useState([
-    {
-      id: uuidv4(),
-      name: "Find a life",
-      completed: false,
-      dueDate: "2025-07-18",
-      category: "Personal",
-      subtasks: [
-        { id: "t1s1", name: "buy alarm clock", completed: false },
-        { id: "t1s2", name: "touch mirror", completed: true },
-      ],
-    },
-    {
-      id: uuidv4(),
-      name: "Check bus schedule",
-      completed: false,
-      dueDate: "2025-07-19",
-      category: "School",
-      subtasks: [
-        { id: "t2s1", name: "find bus stop", completed: false },
-        { id: "t2s2", name: "wait for bus", completed: false },
-      ],
-    },
-    {
-      id: uuidv4(),
-      name: "Watch paint dry",
-      completed: false,
-      dueDate: null,
-      category: "Entertainment",
-      subtasks: [],
+  const [tasks, setTasks] = useState([])
+  useEffect(() => {
+    const stored = localStorage.getItem("tasks")
+    if (stored) {
+      setTasks(JSON.parse(stored))
+    } else {
+      setTasks([
+        {
+          id: uuidv4(),
+          name: "Find a life",
+          completed: false,
+          dueDate: "2025-07-18",
+          category: "Personal",
+          subtasks: [
+            { id: "t1s1", name: "buy alarm clock", completed: false },
+            { id: "t1s2", name: "touch mirror", completed: true },
+          ],
+        },
+        {
+          id: uuidv4(),
+          name: "Check bus schedule",
+          completed: false,
+          dueDate: "2025-07-19",
+          category: "School",
+          subtasks: [
+            { id: "t2s1", name: "find bus stop", completed: false },
+            { id: "t2s2", name: "wait for bus", completed: false },
+          ],
+        },
+        {
+          id: uuidv4(),
+          name: "Watch paint dry",
+          completed: false,
+          dueDate: null,
+          category: "Entertainment",
+          subtasks: [],
+        },
+      ])
     }
-  ])
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks))
+  }, [tasks])
+
+  const toggleTaskComplete = (id) => {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const addTask = (task) => {
+    setTasks(prev => [...prev, { id: uuidv4(), completed: false, subtasks: [], ...task }])
+  }
+
+  const [editingTask, setEditingTask] = useState(null)
   // const tasks = {
   //   urgent: ["RUN"],
   //   personal: [
@@ -84,18 +110,60 @@ export default function Home() {
         <SideBarItem icon={<FileUp />} text="Export" />
       </SideBar>
 
-        
+
       <div className="flex flex-1 relative">
         <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
           <TopBar title="To-Do List" onAddTask={() => setTaskPanelOpen(true)} isTaskPanelOpen={isTaskPanelOpen}/>
 
           <IslandGrid>
-            <CategoryIslands title="Urgent" tasks={tasks.filter(t => t.category === "Urgent")} />
-            <CategoryIslands title="Personal" tasks={tasks.filter(t => t.category === "Personal")} />
-            <CategoryIslands title="School" tasks={tasks.filter(t => t.category === "School")} />
-            <CategoryIslands title="Entertainment" tasks={tasks.filter(t => t.category === "Entertainment")} />
-            <CategoryIslands title="Work" tasks={tasks.filter(t => t.category === "Work")} />
-            <CategoryIslands title="Untagged" tasks={tasks.filter(t => t.category === "Untagged")} />
+            <CategoryIslands title="Urgent" 
+              tasks={tasks.filter(t => t.category === "Urgent")} 
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+            />
+            <CategoryIslands title="Personal" 
+              tasks={tasks.filter(t => t.category === "Personal")} 
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+            />
+            <CategoryIslands title="School" 
+              tasks={tasks.filter(t => t.category === "School")} 
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+            />
+            <CategoryIslands title="Entertainment" 
+              tasks={tasks.filter(t => t.category === "Entertainment")} 
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+            />
+            <CategoryIslands title="Work" 
+              tasks={tasks.filter(t => t.category === "Work")} 
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+            />
+            <CategoryIslands title="Untagged" 
+              tasks={tasks.filter(t => t.category === "Untagged")} 
+              onToggleTask={toggleTaskComplete}
+              onEditTask={(task) => {
+                setEditingTask(task)
+                setTaskPanelOpen(true)
+              }}
+            />
 
             {/* <CategoryIslands title="Urgent" tasks={tasks.urgent} />
             <CategoryIslands title="Personal" tasks={tasks.personal} />
@@ -113,7 +181,15 @@ export default function Home() {
             <CategoryIslands title="Untagged" tasks={tasks.untagged} />
           </div> */}
         </main>
-        <TaskPanel isOpen={isTaskPanelOpen} onClose={() => setTaskPanelOpen(false)} />
+        <TaskPanel
+          isOpen={isTaskPanelOpen}
+          onClose={() => {
+            setTaskPanelOpen(false)
+            setEditingTask(null)
+          }}
+          onAddTask={addTask}
+          editingTask={editingTask}
+        />
       </div>
     </div>
   )
