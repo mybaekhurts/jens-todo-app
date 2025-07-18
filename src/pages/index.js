@@ -27,6 +27,7 @@ export default function Home() {
     const stored = localStorage.getItem("tasks")
     if (stored) {
       setTasks(JSON.parse(stored))
+      setTasks(JSON.parse(stored).map((t, i) => ({ ...t, originalIndex: i })))
     } else {
       setTasks([
         {
@@ -35,6 +36,7 @@ export default function Home() {
           completed: false,
           dueDate: "2025-07-18",
           category: "Personal",
+          originalIndex: 0,
           subtasks: [
             { id: "t1s1", name: "buy alarm clock", completed: false },
             { id: "t1s2", name: "touch mirror", completed: true },
@@ -46,6 +48,7 @@ export default function Home() {
           completed: false,
           dueDate: "2025-07-19",
           category: "School",
+          originalIndex: 1,
           subtasks: [
             { id: "t2s1", name: "find bus stop", completed: false },
             { id: "t2s2", name: "wait for bus", completed: false },
@@ -57,6 +60,7 @@ export default function Home() {
           completed: false,
           dueDate: null,
           category: "Entertainment",
+          originalIndex: 2,
           subtasks: [],
         },
       ])
@@ -76,7 +80,14 @@ export default function Home() {
   // Tasks CRUD
   const handleOpenPanel = () => setTaskPanelOpen(true)
   const addTask = (task) => {
-    setTasks(prev => [...prev, { id: uuidv4(), completed: false, subtasks: [], ...task }])
+    setTasks(prev => [
+      ...prev, 
+      { 
+        id: uuidv4(), 
+        completed: false, 
+        subtasks: [], 
+        originalIndex: prev.length,
+        ...task }])
   }
   const updateTask = (updatedTask) => {
     setTasks(prev =>
@@ -98,6 +109,8 @@ export default function Home() {
     task.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [sortOrder, setSortOrder] = useState("custom"); // "custom", "asc", "desc"
+
 
 
   // const tasks = {
@@ -135,7 +148,7 @@ export default function Home() {
       <div className="flex flex-1 relative">
         <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
           <TopBar
-            title="Dashboard"
+            title="Todo List"
             onAddTask={handleOpenPanel}
             isTaskPanelOpen={isTaskPanelOpen}
             searchTerm={searchTerm}
@@ -144,6 +157,8 @@ export default function Home() {
             setStatusFilter={setStatusFilter}
             itemsPerPage={itemsPerPage}
             setItemsPerPage={setItemsPerPage}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
           />
           <IslandGrid>
             <CategoryIslands
@@ -164,6 +179,8 @@ export default function Home() {
                 setTaskPanelOpen(true)
               }}
               itemsPerPage={itemsPerPage}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
             <CategoryIslands title="School"
               tasks={filteredTasks.filter(t => t.category === "School")}
@@ -173,6 +190,8 @@ export default function Home() {
                 setTaskPanelOpen(true)
               }}
               itemsPerPage={itemsPerPage}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
             <CategoryIslands title="Entertainment"
               tasks={filteredTasks.filter(t => t.category === "Entertainment")}
@@ -182,6 +201,8 @@ export default function Home() {
                 setTaskPanelOpen(true)
               }}
               itemsPerPage={itemsPerPage}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
             <CategoryIslands title="Work"
               tasks={filteredTasks.filter(t => t.category === "Work")}
@@ -190,6 +211,9 @@ export default function Home() {
                 setEditingTask(task)
                 setTaskPanelOpen(true)
               }}
+              itemsPerPage={itemsPerPage}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
             <CategoryIslands title="Untagged"
               tasks={filteredTasks.filter(t => t.category === "Untagged")}
@@ -199,6 +223,8 @@ export default function Home() {
                 setTaskPanelOpen(true)
               }}
               itemsPerPage={itemsPerPage}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
           </IslandGrid>
         </main>

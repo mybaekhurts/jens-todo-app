@@ -1,12 +1,21 @@
 import { useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Clock, ClockArrowUp, ClockArrowDown } from "lucide-react"
 
-export default function CategoryIslands({ title, tasks, onToggleTask, onEditTask, itemsPerPage }) {
+export default function CategoryIslands({ 
+  title, tasks, onToggleTask, onEditTask, 
+  itemsPerPage, sortOrder, setSortOrder 
+}) {
   const [page, setPage] = useState(0)
   // const pageSize = 6
   // const visibleTasks = tasks.slice(0, itemsPerPage)
   const totalPages = Math.ceil(tasks.length / itemsPerPage)
-  const paginatedTasks = tasks.slice(page * itemsPerPage, (page + 1) * itemsPerPage)
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (sortOrder === "asc") return new Date(a.dueDate || 0) - new Date(b.dueDate || 0)
+    if (sortOrder === "desc") return new Date(b.dueDate || 0) - new Date(a.dueDate || 0)
+    return a.originalIndex - b.originalIndex
+  })
+  const paginatedTasks = sortedTasks.slice(page * itemsPerPage, (page + 1) * itemsPerPage)
+
 
   return (
     <div className="w-72 bg-white rounded-2xl shadow p-4 flex flex-col shrink-0">
