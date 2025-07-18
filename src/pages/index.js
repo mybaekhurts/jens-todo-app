@@ -7,7 +7,7 @@ import TaskPanel from "@/components/TaskPanel"
 import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { ClipboardList, Calendar, FileDown, FileUp } from "lucide-react"
-
+import * as XLSX from "xlsx"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -111,7 +111,22 @@ export default function Home() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [sortOrder, setSortOrder] = useState("custom"); // "custom", "asc", "desc"
 
+  // Export and Import tasks to Excel
+  const handleExport = () => {
+    const data = tasks.map(task => ({
+      Name: task.name,
+      Completed: task.completed ? "Yes" : "No",
+      DueDate: task.dueDate || "None",
+      Category: task.category || "Untagged",
+      Subtasks: task.subtasks.map(st => `${st.name} [${st.completed ? "x" : " "}]`).join(", ")
+    }));
 
+    const worksheet = XLSX.utils.json_to_sheet(data)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tasks")
+
+    XLSX.writeFile(workbook, "todo-export.xlsx")
+  }
 
   // const tasks = {
   //   urgent: ["RUN"],
@@ -141,7 +156,7 @@ export default function Home() {
         <SideBarItem icon={<ClipboardList />} text="Tasks" active />
         <SideBarItem icon={<Calendar />} text="Calendar View" />
         <SideBarItem icon={<FileDown />} text="Import" />
-        <SideBarItem icon={<FileUp />} text="Export" />
+        <SideBarItem icon={<FileUp />} text="Export" onClick={handleExport} />
       </SideBar>
 
 
