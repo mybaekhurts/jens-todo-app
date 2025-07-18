@@ -71,9 +71,19 @@ export default function Home() {
   }, [tasks])
   const toggleTaskComplete = (id) => {
     setTasks(prev =>
-      prev.map(task =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
+      prev.map(task => {
+        if (task.id !== id) return task;
+
+        const newCompleted = !task.completed;
+        return {
+          ...task,
+          completed: newCompleted,
+          subtasks: task.subtasks?.map(st => ({
+            ...st,
+            completed: newCompleted ? true : st.completed,
+          })) || [],
+        };
+      })
     );
   };
 
@@ -97,6 +107,9 @@ export default function Home() {
     )
   }
   const [editingTask, setEditingTask] = useState(null)
+  const deleteTask = (id) => {
+    setTasks(prev => prev.filter(t => t.id !== id))
+  }
 
   // Search and filter functionality
   const [searchTerm, setSearchTerm] = useState("")
@@ -164,8 +177,8 @@ export default function Home() {
         <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
           <TopBar
             title="Todo List"
-            onAddTask={handleOpenPanel}
             isTaskPanelOpen={isTaskPanelOpen}
+            onAddTask={handleOpenPanel}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             statusFilter={statusFilter}
@@ -185,6 +198,8 @@ export default function Home() {
                 setTaskPanelOpen(true)
               }}
               itemsPerPage={itemsPerPage}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
             <CategoryIslands title="Personal"
               tasks={filteredTasks.filter(t => t.category === "Personal")}
@@ -252,6 +267,7 @@ export default function Home() {
           onAddTask={addTask}
           onUpdateTask={updateTask}
           editingTask={editingTask}
+          onDeleteTask={deleteTask}
         />
       </div>
     </div>

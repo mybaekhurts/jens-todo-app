@@ -5,8 +5,8 @@ import { Search, Plus, ChevronDown,
 
 const sortOptions = [
   { value: "custom", label: "Custom Order", icon: <Clock className="w-4 h-4" /> },
-  { value: "asc", label: "Oldest First", icon: <ClockArrowUp className="w-4 h-4" /> },
-  { value: "desc", label: "Newest First", icon: <ClockArrowDown className="w-4 h-4" /> },
+  { value: "asc", label: "Due Soonest", icon: <ClockArrowUp className="w-4 h-4" /> },
+  { value: "desc", label: "Due Latest", icon: <ClockArrowDown className="w-4 h-4" /> },
 ]
 
 const statusOptions = [

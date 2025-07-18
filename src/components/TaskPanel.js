@@ -1,10 +1,10 @@
-import { Calendar, Plus, X } from "lucide-react"
+import { Calendar, Plus, X, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 
-export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, editingTask }) {
+export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, editingTask, onDeleteTask}) {
   const [taskName, setTaskName] = useState("")
   const [dueDate, setDueDate] = useState("")
-  const [subtasks, setSubtasks] = useState(["", ""])
+  const [subtasks, setSubtasks] = useState([])
   const [category, setCategory] = useState("Untagged")
 
   useEffect(() => {
@@ -13,13 +13,16 @@ export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, ed
       setDueDate(editingTask.dueDate || "")
       setCategory(editingTask.category || "Untagged")
       setSubtasks(
-        editingTask.subtasks?.map(s => s.name) || [""]
+        editingTask.subtasks?.map(s => ({
+          name: s.name,
+          completed: s.completed || false,
+        })) || []
       )
     } else {
       setTaskName("")
       setDueDate("")
       setCategory("Untagged")
-      setSubtasks([""])
+      setSubtasks([])
     }
   }, [editingTask])
 
@@ -32,36 +35,41 @@ export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, ed
       dueDate: dueDate || null,
       category,
       subtasks: subtasks
-        .filter(s => s.trim())
+        .filter(s => s.name.trim())
         .map((s, i) => ({
           id: `s${i}`,
-          name: s,
-          completed: editingTask?.subtasks?.[i]?.completed || false,
+          name: s.name.trim(),
+          completed: s.completed,
         })),
     }
-
     if (editingTask) {
       onUpdateTask?.(newTask)
     } else {
       onAddTask?.(newTask)
+      setTaskName("")
+      setDueDate("")
+      setSubtasks([])
     }
-
     onClose()
   }
 
-  const updateSubtask = (i, value) => {
+  // Subtask management functions
+  const toggleSubtaskComplete = (i) => {
     const updated = [...subtasks]
-    updated[i] = value
+    updated[i].completed = !updated[i].completed
     setSubtasks(updated)
   }
-
   const addSubtask = () => {
-    setSubtasks([...subtasks, ""])
+    setSubtasks([...subtasks, { name: "", completed: false }])
   }
-
+  const updateSubtask = (i, value) => {
+    const updated = [...subtasks]
+    updated[i].name = value
+    setSubtasks(updated)
+  }
   const removeSubtask = (i) => {
     const updated = subtasks.filter((_, idx) => idx !== i)
-    setSubtasks(updated.length ? updated : [""])
+    setSubtasks(updated.length ? updated : [])
   }
 
   return (
@@ -70,12 +78,29 @@ export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, ed
         isOpen ? "w-96" : "w-0"
     }`}
     >
-      <div className="flex flex-col h-full px-6 py-5">
-        {/* Task Name Field */}
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
-          {editingTask ? "Editing Task" : "Create New Task"}
-        </h2>
+      
+      <div className="flex flex-col h-full p-5">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-semibold text-gray-800">
+            {editingTask ? "Editing Task" : "Create New Task"}
+          </h2>
+          {editingTask && (
+            <button
+              onClick={() => {
+                if (confirm("Delete this task?")) {
+                  onDeleteTask?.(editingTask.id);
+                  onClose();
+                }
+              }}
+              className="text-gray-400 hover:text-red-500"
+            >
+              <Trash size={20} />
+            </button>
+          )}    
+        </div>
         <hr className="my-2 border-t-2 border-pink-700" />
+        {/* Task Name Field */}
         <h3 className="text-md text-gray-700 mb-1">Task Name</h3>
         <input
           type="text"
@@ -97,8 +122,8 @@ export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, ed
             <option value="Urgent">Urgent</option>
             <option value="Personal">Personal</option>
             <option value="School">School</option>
-            <option value="Entertainment">Entertainment</option>
             <option value="Work">Work</option>
+            <option value="Entertainment">Entertainment</option>
           </select>
         </div>
 
@@ -112,9 +137,6 @@ export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, ed
               onChange={e => setDueDate(e.target.value)}
               className="w-full border border-gray-300 rounded-2xl px-3 py-2 text-sm bg-gray-100 cursor-default"
             />
-            {/* <button className="p-2 bg-pink-100 text-pink-800 rounded-2xl hover:bg-pink-200">
-              <Calendar size={18} />
-            </button> */}
           </div>
         </div>
 
@@ -123,27 +145,40 @@ export default function TaskPanel({ isOpen, onClose, onAddTask, onUpdateTask, ed
         {/* Subtasks Section */}
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-md text-gray-700">Subtasks</h3>
-          <button className="p-1 rounded hover:bg-gray-100">
+          <button onClick={addSubtask} className="p-1 rounded hover:bg-gray-100">
             <Plus size={18} />
           </button>
         </div>
 
-        {/* Subtask Input List (static placeholder) */}
-        <div className="space-y-2 flex-1 overflow-y-auto pr-1">
-          <input
-            type="text"
-            placeholder="Subtask 1"
-            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-          />
-          <input
-            type="text"
-            placeholder="Subtask 2"
-            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
-          />
+        <div className="space-y-2 mb-4">
+          {subtasks.map((sub, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input
+                className="accent-pink-500"
+                type="checkbox"
+                checked={sub.completed}
+                onChange={() => toggleSubtaskComplete(i)}
+              />
+              <input
+                type="text"
+                value={sub.name}
+                onChange={(e) => updateSubtask(i, e.target.value)}
+                placeholder={`Subtask ${i + 1}`}
+                className={`w-full border border-gray-200 rounded-md px-3 py-2 text-sm 
+                  ${sub.completed ? "line-through text-gray-400" : ""}`}
+              />
+              <button
+                onClick={() => removeSubtask(i)}
+                className="text-gray-400 hover:text-red-400"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))}
         </div>
 
         {/* Footer Buttons */}
-        <div className="mt-6 flex justify-between">
+        <div className="mt-auto flex justify-between">
           <button onClick={onClose} className="px-4 py-2 rounded-md border text-gray-600 hover:bg-gray-100">
             Cancel
           </button>

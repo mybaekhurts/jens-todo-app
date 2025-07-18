@@ -6,12 +6,20 @@ export default function CategoryIslands({
   itemsPerPage, sortOrder, setSortOrder 
 }) {
   const [page, setPage] = useState(0)
-  // const pageSize = 6
-  // const visibleTasks = tasks.slice(0, itemsPerPage)
   const totalPages = Math.ceil(tasks.length / itemsPerPage)
   const sortedTasks = [...tasks].sort((a, b) => {
-    if (sortOrder === "asc") return new Date(a.dueDate || 0) - new Date(b.dueDate || 0)
-    if (sortOrder === "desc") return new Date(b.dueDate || 0) - new Date(a.dueDate || 0)
+    if (sortOrder === "asc") {
+      if (!a.dueDate && !b.dueDate) return 0
+      if (!a.dueDate) return 1
+      if (!b.dueDate) return -1
+      return new Date(a.dueDate) - new Date(b.dueDate)
+    }
+    if (sortOrder === "desc") {
+      if (!a.dueDate && !b.dueDate) return 0
+      if (!a.dueDate) return 1
+      if (!b.dueDate) return -1
+      return new Date(b.dueDate) - new Date(a.dueDate)
+    }
     return a.originalIndex - b.originalIndex
   })
   const paginatedTasks = sortedTasks.slice(page * itemsPerPage, (page + 1) * itemsPerPage)
