@@ -140,6 +140,43 @@ export default function Home() {
 
     XLSX.writeFile(workbook, "todo-export.xlsx")
   }
+  const handleImport = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result)
+      const workbook = XLSX.read(data, { type: "array" })
+      const sheetName = workbook.SheetNames[0]
+      const worksheet = workbook.Sheets[sheetName]
+      const json = XLSX.utils.sheet_to_json(worksheet)
+
+      const importedTasks = json.map((row, index) => ({
+        id: uuidv4(),
+        name: row.Name || `Untitled ${index}`,
+        completed: row.Completed?.toLowerCase() === "yes",
+        dueDate: row.DueDate === "None" ? null : row.DueDate,
+        category: row.Category || "Untagged",
+        originalIndex: tasks.length + index,
+        subtasks: (row.Subtasks || "")
+          .split(",")
+          .map(s => s.trim())
+          .filter(Boolean)
+          .map((s, i) => {
+            const match = s.match(/^(.*?)\s*\[(x|\s)\]$/i)
+            return {
+              id: `import-${index}-${i}`,
+              name: match ? match[1].trim() : s,
+              completed: match ? match[2].toLowerCase() === "x" : false
+            }
+          })
+      }))
+
+      setTasks(prev => [...prev, ...importedTasks])
+    }
+    reader.readAsArrayBuffer(file)
+  }
 
   // const tasks = {
   //   urgent: ["RUN"],
@@ -168,7 +205,14 @@ export default function Home() {
       <SideBar>
         <SideBarItem icon={<ClipboardList />} text="Tasks" active />
         <SideBarItem icon={<Calendar />} text="Calendar View" />
-        <SideBarItem icon={<FileDown />} text="Import" />
+        <SideBarItem icon={<FileDown />} text="Import" onClick={() => document.getElementById("file-import").click()}/>
+        <input
+          id="file-import"
+          type="file"
+          accept=".xlsx,.xls"
+          onChange={handleImport}
+          style={{ display: "none" }}
+        />
         <SideBarItem icon={<FileUp />} text="Export" onClick={handleExport} />
       </SideBar>
 
