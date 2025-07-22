@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Head from "next/head";
 import SideBar, { SideBarItem } from "../components/SideBar";
 import TopBar from "../components/TopBar"
 import CategoryIslands from "@/components/CategoryIslands"
@@ -121,7 +122,7 @@ export default function Home() {
   }).filter((task) =>
     task.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
   const [sortOrder, setSortOrder] = useState("custom"); // "custom", "asc", "desc"
 
   // Export and Import tasks to Excel
@@ -201,119 +202,125 @@ export default function Home() {
   // }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <SideBar>
-        <SideBarItem icon={<ClipboardList />} text="Tasks" active />
-        <SideBarItem icon={<Calendar />} text="Calendar View" />
-        <SideBarItem icon={<FileDown />} text="Import" onClick={() => document.getElementById("file-import").click()}/>
-        <input
-          id="file-import"
-          type="file"
-          accept=".xlsx,.xls"
-          onChange={handleImport}
-          style={{ display: "none" }}
-        />
-        <SideBarItem icon={<FileUp />} text="Export" onClick={handleExport} />
-      </SideBar>
-
-
-      <div className="flex flex-1 relative">
-        <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
-          <TopBar
-            title="Todo List"
-            isTaskPanelOpen={isTaskPanelOpen}
-            onAddTask={handleOpenPanel}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
+    <>
+      <Head>
+        <title>Todo App</title>
+        <link rel="icon" href="/caticon.png" />
+      </Head>
+      <div className="flex h-screen overflow-hidden">
+        <SideBar>
+          <SideBarItem icon={<ClipboardList />} text="Tasks" active />
+          <SideBarItem icon={<Calendar />} text="Calendar View" />
+          <SideBarItem icon={<FileDown />} text="Import" onClick={() => document.getElementById("file-import").click()}/>
+          <input
+            id="file-import"
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleImport}
+            style={{ display: "none" }}
           />
-          <IslandGrid>
-            <CategoryIslands
-              title="Urgent"
-              tasks={filteredTasks.filter(t => t.category === "Urgent")}
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
+          <SideBarItem icon={<FileUp />} text="Export" onClick={handleExport} />
+        </SideBar>
+
+
+        <div className="flex flex-1 relative">
+          <main className="flex-1 overflow-y-auto min-h-0 transition-all duration-300">
+            <TopBar
+              title="Todo List"
+              isTaskPanelOpen={isTaskPanelOpen}
+              onAddTask={handleOpenPanel}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
               itemsPerPage={itemsPerPage}
+              setItemsPerPage={setItemsPerPage}
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
             />
-            <CategoryIslands title="Personal"
-              tasks={filteredTasks.filter(t => t.category === "Personal")}
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-              itemsPerPage={itemsPerPage}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-            <CategoryIslands title="School"
-              tasks={filteredTasks.filter(t => t.category === "School")}
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-              itemsPerPage={itemsPerPage}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-            <CategoryIslands title="Entertainment"
-              tasks={filteredTasks.filter(t => t.category === "Entertainment")}
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-              itemsPerPage={itemsPerPage}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-            <CategoryIslands title="Work"
-              tasks={filteredTasks.filter(t => t.category === "Work")}
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-              itemsPerPage={itemsPerPage}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-            <CategoryIslands title="Untagged"
-              tasks={filteredTasks.filter(t => t.category === "Untagged")}
-              onToggleTask={toggleTaskComplete}
-              onEditTask={(task) => {
-                setEditingTask(task)
-                setTaskPanelOpen(true)
-              }}
-              itemsPerPage={itemsPerPage}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-          </IslandGrid>
-        </main>
-        <TaskPanel
-          isOpen={isTaskPanelOpen}
-          onClose={() => {
-            setTaskPanelOpen(false)
-            setEditingTask(null)
-          }}
-          onAddTask={addTask}
-          onUpdateTask={updateTask}
-          editingTask={editingTask}
-          onDeleteTask={deleteTask}
-        />
+            <IslandGrid>
+              <CategoryIslands
+                title="Urgent"
+                tasks={filteredTasks.filter(t => t.category === "Urgent")}
+                onToggleTask={toggleTaskComplete}
+                onEditTask={(task) => {
+                  setEditingTask(task)
+                  setTaskPanelOpen(true)
+                }}
+                itemsPerPage={itemsPerPage}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+              <CategoryIslands title="Personal"
+                tasks={filteredTasks.filter(t => t.category === "Personal")}
+                onToggleTask={toggleTaskComplete}
+                onEditTask={(task) => {
+                  setEditingTask(task)
+                  setTaskPanelOpen(true)
+                }}
+                itemsPerPage={itemsPerPage}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+              <CategoryIslands title="School"
+                tasks={filteredTasks.filter(t => t.category === "School")}
+                onToggleTask={toggleTaskComplete}
+                onEditTask={(task) => {
+                  setEditingTask(task)
+                  setTaskPanelOpen(true)
+                }}
+                itemsPerPage={itemsPerPage}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+              <CategoryIslands title="Entertainment"
+                tasks={filteredTasks.filter(t => t.category === "Entertainment")}
+                onToggleTask={toggleTaskComplete}
+                onEditTask={(task) => {
+                  setEditingTask(task)
+                  setTaskPanelOpen(true)
+                }}
+                itemsPerPage={itemsPerPage}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+              <CategoryIslands title="Work"
+                tasks={filteredTasks.filter(t => t.category === "Work")}
+                onToggleTask={toggleTaskComplete}
+                onEditTask={(task) => {
+                  setEditingTask(task)
+                  setTaskPanelOpen(true)
+                }}
+                itemsPerPage={itemsPerPage}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+              <CategoryIslands title="Untagged"
+                tasks={filteredTasks.filter(t => t.category === "Untagged")}
+                onToggleTask={toggleTaskComplete}
+                onEditTask={(task) => {
+                  setEditingTask(task)
+                  setTaskPanelOpen(true)
+                }}
+                itemsPerPage={itemsPerPage}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+            </IslandGrid>
+          </main>
+          <TaskPanel
+            isOpen={isTaskPanelOpen}
+            onClose={() => {
+              setTaskPanelOpen(false)
+              setEditingTask(null)
+            }}
+            onAddTask={addTask}
+            onUpdateTask={updateTask}
+            editingTask={editingTask}
+            onDeleteTask={deleteTask}
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
